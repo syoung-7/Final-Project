@@ -107,16 +107,21 @@ class Restaurant:
         self.display_menu()
 
         choice = input(
-            "\nEnter item or combo name exactly as shown: "
-        )
+            "\nEnter item or combo: "
+        ).strip().lower()
 
-        # Insert choice.lower() to make the input case-insensitive. Do same for if and elif statements below.
-        if choice in self.menu:
-            item = MenuItem(choice, self.menu[choice])
+        # Case insensitive Addition
+        menu_lookup = {name.lower(): name for name in self.menu}
+        combo_lookup = {name.lower(): name for name in self.combos}
+        
+        if choice in menu_lookup:
+            actual_name = menu_lookup[choice]
+            item = MenuItem(actual_name, self.menu[actual_name])
             self.order.add_item(item)
 
-        elif choice in self.combos:
-            self.order.add_item(self.combos[choice])
+        elif choice in combo_lookup:
+            actual_name = combo_lookup[choice]
+            self.order.add_item(self.combos[actual_name])
 
         else:
             print("\nItem not found.")
@@ -126,8 +131,6 @@ class Restaurant:
         item_name = input(
             "\nEnter item or combo name to remove: "
         )
-
-        # Insert choice.lower() to make the input case-insensitive. Do same for if and elif statements below.
 
         self.order.remove_item(item_name)
 
