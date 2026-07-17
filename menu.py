@@ -1,6 +1,6 @@
 #Final Project  
 #Steve Young & Bradley Moore
-#Version 1.0.1
+#Version 1.0.2
 #16 Jul 2026
 
 class MenuItem:
@@ -137,10 +137,7 @@ class Restaurant:
     def checkout(self):
         if not self.order.items:
             print("\nNo items ordered.")
-            #Currently, the program will quit if there were no items ordered. 
-            #Maybe prompt the user to either proceed with ordering or quit 
-            #(if they meant to hit 6 instead of 5) to keep the program running.
-            return
+            return False
 
         # Update receipt display using ASCII art
         print("\n========== RECEIPT ==========")
@@ -160,6 +157,7 @@ class Restaurant:
         print("-" * 30)
 
         print("\nThank you for dining with us!")
+        return True
 
     def run(self):
         while True:
@@ -187,8 +185,8 @@ class Restaurant:
                 self.order.display_order()
 
             elif choice == "5":
-                self.checkout()
-                break
+                if self.checkout():
+                    break
 
             elif choice == "6":
                 print("\nGoodbye!")
