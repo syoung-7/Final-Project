@@ -1,5 +1,7 @@
 #Final Project  
 #Steve Young & Bradley Moore
+#Version 1.0.1
+#16 Jul 2026
 
 class MenuItem:
     def __init__(self, name, price):
@@ -56,7 +58,8 @@ class Restaurant:
             "Pizza": 12.99,
             "Fries": 3.49,
             "Drink": 1.99,
-            "Salad": 6.49
+            "Salad": 6.49,
+            "Breadstick": 2.49
         }
 
         # Dictionary for combo meals
@@ -70,19 +73,20 @@ class Restaurant:
             "Pizza Combo": ComboMeal(
                 "Pizza Combo",
                 15.99,
-                ["Pizza", "Drink"]
+                ["Pizza", "Breadstick","Drink"]
             ),
 
             "Salad Combo": ComboMeal(
                 "Salad Combo",
                 8.99,
-                ["Salad", "Drink"]
+                ["Salad", "Breadstick", "Drink"]
             )
         }
 
         self.order = Order()
 
     def display_menu(self):
+        # Update menu display using ASCII art
         print("\n========== MENU ==========")
 
         print("\nIndividual Items")
@@ -106,6 +110,7 @@ class Restaurant:
             "\nEnter item or combo name exactly as shown: "
         )
 
+        # Insert choice.lower() to make the input case-insensitive. Do same for if and elif statements below.
         if choice in self.menu:
             item = MenuItem(choice, self.menu[choice])
             self.order.add_item(item)
@@ -116,18 +121,25 @@ class Restaurant:
         else:
             print("\nItem not found.")
 
+
     def remove_from_order(self):
         item_name = input(
             "\nEnter item or combo name to remove: "
         )
+
+        # Insert choice.lower() to make the input case-insensitive. Do same for if and elif statements below.
 
         self.order.remove_item(item_name)
 
     def checkout(self):
         if not self.order.items:
             print("\nNo items ordered.")
+            #Currently, the program will quit if there were no items ordered. 
+            #Maybe prompt the user to either proceed with ordering or quit 
+            #(if they meant to hit 6 instead of 5) to keep the program running.
             return
 
+        # Update receipt display using ASCII art
         print("\n========== RECEIPT ==========")
 
         subtotal = self.order.calculate_total()
@@ -148,7 +160,7 @@ class Restaurant:
 
     def run(self):
         while True:
-
+            # Update options display using ASCII art
             print("\n===== RESTAURANT ORDERING SYSTEM =====")
             print("1. View Menu")
             print("2. Add Item")
@@ -180,7 +192,7 @@ class Restaurant:
                 break
 
             else:
-                print("\nInvalid selection. Try again.")
+                print("\nInvalid selection. Please try again.")
 
 
 # Main Program
