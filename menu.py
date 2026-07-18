@@ -1,7 +1,7 @@
 #Final Project  
 #Steve Young & Bradley Moore
-#Version 1.0.2
-#16 Jul 2026
+#Version 1.0.3
+#17 Jul 2026
 
 class MenuItem:
     def __init__(self, name, price):
@@ -37,13 +37,29 @@ class Order:
             print("\nYour order is empty.")
             return
 
-        print("\n----- CURRENT ORDER -----")
+        print("\n" + "=" * 42)
+        print("CURRENT ORDER".center(42))
+        print("=" * 42)
+        print(f"{'Qty':<4}{'Item':<18}{'Unit':>9}")
+        print("-" * 31)
 
+        grouped = self.grouped_items()
+        for name, data in grouped.items():
+            count = data["count"]
+            unit_price = data["item"].price
+            print(f"{count:<4}{name:<18}${unit_price:>8.2f}")
+
+        print("-" * 31)
+        print(f"{'Subtotal:':<22}{f'${self.calculate_total():.2f}':>9}")
+        print("=" * 31)
+
+    def grouped_items(self):
+        grouped = {}
         for item in self.items:
-            print(f"{item.name:<20} ${item.price:.2f}")
-
-        print("-" * 30)
-        print(f"Subtotal: ${self.calculate_total():.2f}")
+            if item.name not in grouped:
+                grouped[item.name] = {"item": item, "count": 0}
+            grouped[item.name]["count"] += 1
+        return grouped
 
     def calculate_total(self):
         return sum(item.price for item in self.items)
@@ -87,7 +103,9 @@ class Restaurant:
 
     def display_menu(self):
         # Update menu display using ASCII art
-        print("\n========== MENU ==========")
+        print("\n" + "=" * 42)
+        print("MENU".center(42))
+        print("=" * 42)
 
         print("\nIndividual Items")
 
@@ -140,21 +158,31 @@ class Restaurant:
             return False
 
         # Update receipt display using ASCII art
-        print("\n========== RECEIPT ==========")
+        print("\n" + "=" * 42)
+        print("RECEIPT".center(42))
+        print("=" * 42)
 
         subtotal = self.order.calculate_total()
         tax_rate = 0.07
         tax = subtotal * tax_rate
         total = subtotal + tax
 
-        for item in self.order.items:
-            print(f"{item.name:<20} ${item.price:.2f}")
+        grouped = self.order.grouped_items()
+        print(f"{'Qty':<4}{'Item':<18}{'Unit':>9}{'Total':>11}")
+        print("-" * 42)
+        for name, data in grouped.items():
+            item = data["item"]
+            count = data["count"]
+            line_total = item.price * count
+            unit_str = f"${item.price:.2f}"
+            total_str = f"${line_total:.2f}"
+            print(f"{count:<4}{item.name:<18}{unit_str:>9}{total_str:>11}")
 
-        print("-" * 30)
-        print(f"Subtotal:      ${subtotal:.2f}")
-        print(f"Tax (7%):      ${tax:.2f}")
-        print(f"Grand Total:   ${total:.2f}")
-        print("-" * 30)
+        print("-" * 42)
+        print(f"{'Subtotal:':<31}{f'${subtotal:.2f}':>11}")
+        print(f"{'Tax (7%):':<31}{f'${tax:.2f}':>11}")
+        print(f"{'Grand Total:':<31}{f'${total:.2f}':>11}")
+        print("=" * 42)
 
         print("\nThank you for dining with us!")
         return True
@@ -162,7 +190,9 @@ class Restaurant:
     def run(self):
         while True:
             # Update options display using ASCII art
-            print("\n===== RESTAURANT ORDERING SYSTEM =====")
+            print("\n" + "=" * 42)
+            print("RESTAURANT ORDERING SYSTEM".center(42))
+            print("=" * 42)
             print("1. View Menu")
             print("2. Add Item")
             print("3. Remove Item")
