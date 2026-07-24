@@ -101,6 +101,16 @@ class Restaurant:
 
         self.order = Order()
 
+    def _get_input(self, prompt):
+        try:
+            return input(prompt).strip()
+        except EOFError:
+            print("\nInput closed unexpectedly. Returning to the menu.")
+            return ""
+        except KeyboardInterrupt:
+            print("\nInput cancelled. Returning to the menu.")
+            return ""
+
     def display_menu(self):
         # Update menu display using ASCII art
         print("\n" + "=" * 42)
@@ -124,68 +134,78 @@ class Restaurant:
     def add_to_order(self):
         self.display_menu()
 
-        choice = input(
-            "\nEnter item or combo: "
-        ).strip().lower()
+        try:
+            choice = self._get_input("\nEnter item or combo: ").lower()
 
-        # Case insensitive Addition
-        menu_lookup = {name.lower(): name for name in self.menu}
-        combo_lookup = {name.lower(): name for name in self.combos}
-        
-        if choice in menu_lookup:
-            actual_name = menu_lookup[choice]
-            item = MenuItem(actual_name, self.menu[actual_name])
-            self.order.add_item(item)
+            # Case insensitive Addition
+            menu_lookup = {name.lower(): name for name in self.menu}
+            combo_lookup = {name.lower(): name for name in self.combos}
+            
+            if choice in menu_lookup:
+                actual_name = menu_lookup[choice]
+                item = MenuItem(actual_name, self.menu[actual_name])
+                self.order.add_item(item)
 
-        elif choice in combo_lookup:
-            actual_name = combo_lookup[choice]
-            self.order.add_item(self.combos[actual_name])
+            elif choice in combo_lookup:
+                actual_name = combo_lookup[choice]
+                self.order.add_item(self.combos[actual_name])
 
-        else:
-            print("\nItem not found.")
+            else:
+                print("\nItem not found.")
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            print(f"\nUnable to add item: {exc}")
 
 
     def remove_from_order(self):
-        item_name = input(
-            "\nEnter item or combo name to remove: "
-        )
+        item_name = self._get_input("\nEnter item or combo name to remove: ")
 
-        self.order.remove_item(item_name)
+        if not item_name:
+            print("\nNo item name entered.")
+            return
+
+        try:
+            self.order.remove_item(item_name)
+        except (AttributeError, TypeError, ValueError) as exc:
+            print(f"\nUnable to remove item: {exc}")
 
     def checkout(self):
         if not self.order.items:
             print("\nNo items ordered.")
             return False
 
-        # Update receipt display using ASCII art
-        print("\n" + "=" * 42)
-        print("RECEIPT".center(42))
-        print("=" * 42)
+        try:
+            # Update receipt display using ASCII art
+            print("\n" + "=" * 42)
+            print("RECEIPT".center(42))
+            print("=" * 42)
 
-        subtotal = self.order.calculate_total()
-        tax_rate = 0.07
-        tax = subtotal * tax_rate
-        total = subtotal + tax
+            subtotal = self.order.calculate_total()
+            tax_rate = 0.07
+            tax = subtotal * tax_rate
+            total = subtotal + tax
 
-        grouped = self.order.grouped_items()
-        print(f"{'Qty':<4}{'Item':<18}{'Unit':>9}{'Total':>11}")
-        print("-" * 42)
-        for name, data in grouped.items():
-            item = data["item"]
-            count = data["count"]
-            line_total = item.price * count
-            unit_str = f"${item.price:.2f}"
-            total_str = f"${line_total:.2f}"
-            print(f"{count:<4}{item.name:<18}{unit_str:>9}{total_str:>11}")
+            grouped = self.order.grouped_items()
+            print(f"{'Qty':<4}{'Item':<18}{'Unit':>9}{'Total':>11}")
+            print("-" * 42)
+            for name, data in grouped.items():
+                item = data["item"]
+                count = data["count"]
+                line_total = item.price * count
+                unit_str = f"${item.price:.2f}"
+                total_str = f"${line_total:.2f}"
+                print(f"{count:<4}{item.name:<18}{unit_str:>9}{total_str:>11}")
 
-        print("-" * 42)
-        print(f"{'Subtotal:':<31}{f'${subtotal:.2f}':>11}")
-        print(f"{'Tax (7%):':<31}{f'${tax:.2f}':>11}")
-        print(f"{'Grand Total:':<31}{f'${total:.2f}':>11}")
-        print("=" * 42)
+            print("-" * 42)
+            print(f"{'Subtotal:':<31}{f'${subtotal:.2f}':>11}")
+            print(f"{'Tax (7%):':<31}{f'${tax:.2f}':>11}")
+            print(f"{'Grand Total:':<31}{f'${total:.2f}':>11}")
+            print("=" * 42)
 
-        print("\nThank you for dining with us!")
-        return True
+            print("\nThank you for dining with us!")
+            return True
+        except (AttributeError, KeyError, TypeError, ValueError) as exc:
+            print(f"\nUnable to process checkout: {exc}")
+            return False
 
     def run(self):
         while True:
@@ -200,30 +220,33 @@ class Restaurant:
             print("5. Checkout")
             print("6. Exit")
 
-            choice = input("\nChoose an option: ")
+            choice = self._get_input("\nChoose an option: ")
 
-            if choice == "1":
-                self.display_menu()
+            try:
+                if choice == "1":
+                    self.display_menu()
 
-            elif choice == "2":
-                self.add_to_order()
+                elif choice == "2":
+                    self.add_to_order()
 
-            elif choice == "3":
-                self.remove_from_order()
+                elif choice == "3":
+                    self.remove_from_order()
 
-            elif choice == "4":
-                self.order.display_order()
+                elif choice == "4":
+                    self.order.display_order()
 
-            elif choice == "5":
-                if self.checkout():
+                elif choice == "5":
+                    if self.checkout():
+                        break
+
+                elif choice == "6":
+                    print("\nGoodbye!")
                     break
 
-            elif choice == "6":
-                print("\nGoodbye!")
-                break
-
-            else:
-                print("\nInvalid selection. Please try again.")
+                else:
+                    print("\nInvalid selection. Please try again.")
+            except Exception as exc:
+                print(f"\nAn unexpected error occurred: {exc}")
 
 
 # Main Program
